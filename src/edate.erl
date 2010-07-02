@@ -17,8 +17,8 @@
          tomorrow/0,
          yesterday/0,
          shift/2,
-         shift/3,
-         easter/1]).
+         shift/3]).
+-export([easter/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 % @spec today() -> date()
@@ -61,14 +61,8 @@ find_valid_date(Date) ->
             find_valid_date({Y, M, D-1})
     end.
 
-fix(NCent, N1) when NCent >= 38 -> N1 - 2;
-fix(NCent, N1) when NCent == 21 orelse NCent == 24 orelse NCent == 25 -> N1 - 1;
-fix(NCent, N1) when NCent == 33 orelse NCent == 36 orelse NCent == 37 -> N1 - 2;
-fix(NCent, N1) when NCent > 26 -> N1 - 1;
-fix(_NCent, N1) -> N1. 
-
-% Derived from http://www.gmarts.org/index.php?go=415#geteasterdatec
-% Converted by Evan Haas <evanhaas@gmail.com>
+% derived from http://www.gmarts.org/index.php?go=415#geteasterdatec
+% converted by Evan Haas <evanhaas@gmail.com>
 % @spec easter(Year::integer()) -> date()
 % @doc returns Date of Easter (Roman Catholic) in the specified year
 easter(Year) ->
@@ -76,20 +70,23 @@ easter(Year) ->
   NRemain19 = Year rem 19,
   N1Tmp1 = fix(NCent, ((NCent - 15) div 2) + 202 - (11 * NRemain19)),
   N1Tmp2 = N1Tmp1 rem 30,
-
   N1 = case N1Tmp2 == 29 orelse (N1Tmp2 == 28 andalso NRemain19 > 10) of
-        true -> N1Tmp2 - 1;
-        false -> N1Tmp2
+           true -> N1Tmp2 - 1;
+           false -> N1Tmp2
        end,
-
   DtPFM = case N1 > 10 of
-            true -> {Year, 4, N1 - 10};
-            false -> {Year, 3, N1 + 21}
+              true -> {Year, 4, N1 - 10};
+              false -> {Year, 3, N1 + 21}
           end,
-
   NWeekDay = calendar:day_of_the_week(DtPFM) rem 7,
-  calendar:gregorian_days_to_date(calendar:date_to_gregorian_days(DtPFM) + (7 - NWeekDay)).
-      
+  shift(DtPFM, 7 - NWeekDay, days).
+
+fix(NCent, N1) when NCent >= 38 -> N1 - 2;
+fix(NCent, N1) when NCent == 21 orelse NCent == 24 orelse NCent == 25 -> N1 - 1;
+fix(NCent, N1) when NCent == 33 orelse NCent == 36 orelse NCent == 37 -> N1 - 2;
+fix(NCent, N1) when NCent > 26 -> N1 - 1;
+fix(_NCent, N1) -> N1.
+
 shift_test_() ->
     [?_assertEqual(date(), shift(0, days)),
      ?_assertEqual(date(), shift(0, days)),
@@ -130,3 +127,12 @@ shift_test_() ->
      ?_assertEqual({2012,2,29}, shift({2012,1,31}, 1, month)),
      ?_assertEqual({2012,2,29}, shift({2012,4,30}, -2, months)),
      ?_assertEqual({2013,2,28}, shift({2012,2,29}, 1, year))].
+
+easter_test_() ->
+    [?_assertEqual({2008,3,23}, easter(2008)),
+     ?_assertEqual({2009,4,12}, easter(2009)),
+     ?_assertEqual({2010,4,4}, easter(2010)),
+     ?_assertEqual({2011,4,24}, easter(2011)),
+     ?_assertEqual({2012,4,8}, easter(2012)),
+     ?_assertEqual({2013,3,31}, easter(2013)),
+     ?_assertEqual({2014,4,20}, easter(2014))].

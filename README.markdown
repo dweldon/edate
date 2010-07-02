@@ -20,11 +20,11 @@ returns yesterday's date.
 
 ### shift(N, Period) -> Date
 returns a new date after shifting today's date by N periods. N is an integer,
-Period is day | days | week | weeks | month | months | year | years
+Period is `day | days | week | weeks | month | months | year | years`
 
 ### shift(StartDate, N, Period) -> Date
 returns a new date after shifting StartDate by N periods. N is an integer,
-Period is day | days | week | weeks | month | months | year | years
+Period is `day | days | week | weeks | month | months | year | years`
     > edate:shift({2000,1,1}, -2, days)
     {1999,12,30}
     > edate:shift({2000,1,1}, 1, week)
