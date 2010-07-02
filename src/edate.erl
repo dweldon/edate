@@ -77,14 +77,16 @@ easter(Year) ->
   N1Tmp1 = fix(NCent, ((NCent - 15) div 2) + 202 - (11 * NRemain19)),
   N1Tmp2 = N1Tmp1 rem 30,
 
-  N1 = if
-        N1Tmp2 == 29 orelse (N1Tmp2 == 28 andalso NRemain19 > 10) -> N1Tmp2 - 1;
-        true -> N1Tmp2
+  N1 = case N1Tmp2 == 29 orelse (N1Tmp2 == 28 andalso NRemain19 > 10) of
+        true -> N1Tmp2 - 1;
+        false -> N1Tmp2
        end,
-  DtPFM = if
-    N1 > 10 -> {Year, 4, N1 - 10};
-    true -> {Year, 3, N1 + 21}
-  end,
+
+  DtPFM = case N1 > 10 of
+            true -> {Year, 4, N1 - 10};
+            false -> {Year, 3, N1 + 21}
+          end,
+
   NWeekDay = calendar:day_of_the_week(DtPFM) rem 7,
   calendar:gregorian_days_to_date(calendar:date_to_gregorian_days(DtPFM) + (7 - NWeekDay)).
       
