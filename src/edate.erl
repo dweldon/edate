@@ -17,7 +17,8 @@
          tomorrow/0,
          yesterday/0,
          shift/2,
-         shift/3]).
+         shift/3,
+         easter/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 % @spec today() -> date()
@@ -60,6 +61,33 @@ find_valid_date(Date) ->
             find_valid_date({Y, M, D-1})
     end.
 
+fix(NCent, N1) when NCent >= 38 -> N1 - 2;
+fix(NCent, N1) when NCent == 21 orelse NCent == 24 orelse NCent == 25 -> N1 - 1;
+fix(NCent, N1) when NCent == 33 orelse NCent == 36 orelse NCent == 37 -> N1 - 2;
+fix(NCent, N1) when NCent > 26 -> N1 - 1;
+fix(_NCent, N1) -> N1. 
+
+% Derived from http://www.gmarts.org/index.php?go=415#geteasterdatec
+% Converted by Evan Haas <evanhaas@gmail.com>
+% @spec easter(Year::integer()) -> date()
+% @doc returns Date of Easter (Roman Catholic) in the specified year
+easter(Year) ->
+  NCent = Year div 100,
+  NRemain19 = Year rem 19,
+  N1Tmp1 = fix(NCent, ((NCent - 15) div 2) + 202 - (11 * NRemain19)),
+  N1Tmp2 = N1Tmp1 rem 30,
+
+  N1 = if
+        N1Tmp2 == 29 orelse (N1Tmp2 == 28 andalso NRemain19 > 10) -> N1Tmp2 - 1;
+        true -> N1Tmp2
+       end,
+  DtPFM = if
+    N1 > 10 -> {Year, 4, N1 - 10};
+    true -> {Year, 3, N1 + 21}
+  end,
+  NWeekDay = calendar:day_of_the_week(DtPFM) rem 7,
+  calendar:gregorian_days_to_date(calendar:date_to_gregorian_days(DtPFM) + (7 - NWeekDay)).
+      
 shift_test_() ->
     [?_assertEqual(date(), shift(0, days)),
      ?_assertEqual(date(), shift(0, days)),
