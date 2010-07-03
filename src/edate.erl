@@ -19,7 +19,9 @@
          shift/2,
          shift/3,
          beginning_of_month/1,
-         end_of_month/1]).
+         end_of_month/1,
+         date_to_string/1,
+         string_to_date/1]).
 -export([easter/1]).
 -include_lib("eunit/include/eunit.hrl").
 
@@ -31,12 +33,6 @@ tomorrow() -> shift(1, day).
 
 % @spec yesterday() -> date()
 yesterday() -> shift(-1, day).
-
-% @spec beginning_of_month(Date::date()) -> date()
-beginning_of_month({Y, M, _D}) -> {Y, M, 1}.
-
-% @spec end_of_month(Date::date()) -> date()
-end_of_month({Y, M, _D}) -> {Y, M, calendar:last_day_of_the_month(Y, M)}.
 
 % @spec shift(N::integer(), Period::period()) -> date()
 %       period() = day | days | week | weeks | month | months | year | years
@@ -68,6 +64,28 @@ find_valid_date(Date) ->
             {Y, M, D} = Date,
             find_valid_date({Y, M, D-1})
     end.
+
+% @spec beginning_of_month(Date::date()) -> date()
+beginning_of_month({Y, M, _D}) -> {Y, M, 1}.
+
+% @spec end_of_month(Date::date()) -> date()
+end_of_month({Y, M, _D}) -> {Y, M, calendar:last_day_of_the_month(Y, M)}.
+
+% @spec date_to_string(Date::date()) -> string()
+date_to_string({Y, M, D}) ->
+    true = calendar:valid_date({Y, M, D}),
+    lists:flatten(io_lib:format("~4..0B-~2..0B-~2..0B", [Y, M, D])).
+
+% @spec string_to_date(String::string()) -> date()
+string_to_date(String) ->
+    [Year, Month, Day] =
+        case string:tokens(String, "-/") of
+            [Y, M, D] when length(Y) =:= 4 -> [Y, M, D];
+            [M, D, Y] when length(Y) =:= 4 -> [Y, M, D]
+        end,
+    Date = list_to_tuple([list_to_integer(X) || X <- [Year, Month, Day]]),
+    true = calendar:valid_date(Date),
+    Date.
 
 % derived from http://www.gmarts.org/index.php?go=415#geteasterdatec
 % converted by Evan Haas <evanhaas@gmail.com>
@@ -147,6 +165,21 @@ end_of_month_test_() ->
      ?_assertEqual({2012,2,29}, end_of_month({2012,2,1})),
      ?_assertEqual({2010,2,28}, end_of_month({2010,2,28})),
      ?_assertEqual({2010,2,28}, end_of_month({2010,2,1}))].
+
+date_to_string_test_() ->
+    [?_assertEqual("1976-12-20", date_to_string({1976,12,20})),
+     ?_assertEqual("1976-03-18", date_to_string({1976,3,18})),
+     ?_assertEqual("2010-01-02", date_to_string({2010,1,2}))].
+
+string_to_date_test_() ->
+    [?_assertEqual({2010,1,2}, string_to_date("2010-01-02")),
+     ?_assertEqual({2010,1,2}, string_to_date("2010-1-2")),
+     ?_assertEqual({2010,1,2}, string_to_date("2010/01/02")),
+     ?_assertEqual({2010,1,2}, string_to_date("2010/1/2")),
+     ?_assertEqual({2010,1,2}, string_to_date("01-02-2010")),
+     ?_assertEqual({2010,1,2}, string_to_date("1-2-2010")),
+     ?_assertEqual({2010,1,2}, string_to_date("01/02/2010")),
+     ?_assertEqual({2010,1,2}, string_to_date("1/2/2010"))].
 
 easter_test_() ->
     [?_assertEqual({2008,3,23}, easter(2008)),

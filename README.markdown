@@ -38,12 +38,25 @@ Period is `day | days | week | weeks | month | months | year | years`
 returns a new date representing the beginning of the month containing StartDate.
     > edate:beginning_of_month({2010,2,15}).
     {2010,2,1}
-    > edate:beginning_of_month(edate:shift(-1, month)).
+    > edate:beginning_of_month(edate:shift({2010,7,2}, -1, month)).
     {2010,6,1}
 
 ### end_of_month(StartDate) -> Date
 returns a new date representing the end of the month containing StartDate.
     > edate:end_of_month({2010,2,15}).
     {2010,2,28}
-    > edate:end_of_month(edate:shift(-1, month)).
+    > edate:end_of_month(edate:shift({2010,7,2}, -1, month)).
     {2010,6,30}
+
+### date_to_string(Date) -> String
+returns an [ISO 8601](http://en.wikipedia.org/wiki/Iso8601) representation of Date.
+    > edate:date_to_string({1976,3,18}).
+    "1976-03-18"
+
+### string_to_date(String) -> Date
+returns a date representation of String. the following formats are valid
+(with or without zero-padding): YYYY-MM-DD, YYYY/MM/DD, MM-DD-YYYY, MM/DD/YYYY.
+    > edate:string_to_date("1976-03-18").
+    {1976,3,18}
+    > edate:string_to_date("3/18/1976").
+    {1976,3,18}
