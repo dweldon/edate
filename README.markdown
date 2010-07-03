@@ -15,6 +15,8 @@ Functions
 * shift/2
 * shift/3
 * subtract/2
+* is_in_future/1
+* is_in_past/1
 * beginning_of_month/1
 * end_of_month/1
 * date_to_string/1
@@ -54,6 +56,24 @@ returns Date1 - Date2 in an integer number of days. if Days > 0, Date1 > Date2.
     3
     > edate:subtract({2010,7,1}, {2010,7,4}).
     -3
+
+### is_in_future(Date) -> true | false
+returns true if Date is in the future, false otherwise.
+    > edate:is_in_future({3000,7,1}).
+    true
+    > edate:is_in_future({1950,7,1}).
+    false
+    > edate:is_in_future(edate:today()).
+    false
+
+### is_in_past(Date) -> true | false
+returns true if Date is in the past, false otherwise.
+    > edate:is_in_past({3000,7,1}).
+    false
+    > edate:is_in_past({1950,7,1}).
+    true
+    > edate:is_in_past(edate:today()).
+    false
 
 ### beginning_of_month(StartDate) -> Date
 returns a new date representing the beginning of the month containing StartDate.

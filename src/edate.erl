@@ -19,6 +19,8 @@
          shift/2,
          shift/3,
          subtract/2,
+         is_in_future/1,
+         is_in_past/1,
          beginning_of_month/1,
          end_of_month/1,
          date_to_string/1,
@@ -71,6 +73,12 @@ find_valid_date(Date) ->
 subtract(Date1, Date2) ->
     calendar:date_to_gregorian_days(Date1) -
     calendar:date_to_gregorian_days(Date2).
+
+% @spec is_in_future(Date) -> bool()
+is_in_future(Date) -> subtract(Date, today()) > 0.
+
+% @spec is_in_past(Date) -> bool()
+is_in_past(Date) -> subtract(Date, today()) < 0.
 
 % @spec beginning_of_month(Date::date()) -> date()
 beginning_of_month({Y, M, _D}) -> {Y, M, 1}.
@@ -180,6 +188,16 @@ subtract_test_() ->
      ?_assertEqual(-3, subtract({2010,7,1}, {2010,7,4})),
      ?_assertEqual(1, subtract(today(), yesterday())),
      ?_assertEqual(0, subtract(today(), today()))].
+
+is_in_future_test_() ->
+    [?_assertEqual(true, is_in_future(tomorrow())),
+     ?_assertEqual(false, is_in_future(yesterday())),
+     ?_assertEqual(false, is_in_future(today()))].
+
+is_in_past_test_() ->
+    [?_assertEqual(false, is_in_past(tomorrow())),
+     ?_assertEqual(true, is_in_past(yesterday())),
+     ?_assertEqual(false, is_in_past(today()))].
 
 beginning_of_month_test_() ->
     [?_assertEqual({2012,2,1}, beginning_of_month({2012,2,15})),
