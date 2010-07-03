@@ -17,7 +17,9 @@
          tomorrow/0,
          yesterday/0,
          shift/2,
-         shift/3]).
+         shift/3,
+         beginning_of_month/1,
+         end_of_month/1]).
 -export([easter/1]).
 -include_lib("eunit/include/eunit.hrl").
 
@@ -29,6 +31,12 @@ tomorrow() -> shift(1, day).
 
 % @spec yesterday() -> date()
 yesterday() -> shift(-1, day).
+
+% @spec beginning_of_month(Date::date()) -> date()
+beginning_of_month({Y, M, _D}) -> {Y, M, 1}.
+
+% @spec end_of_month(Date::date()) -> date()
+end_of_month({Y, M, _D}) -> {Y, M, calendar:last_day_of_the_month(Y, M)}.
 
 % @spec shift(N::integer(), Period::period()) -> date()
 %       period() = day | days | week | weeks | month | months | year | years
@@ -66,20 +74,22 @@ find_valid_date(Date) ->
 % @spec easter(Year::integer()) -> date()
 % @doc returns Date of Easter (Roman Catholic) in the specified year
 easter(Year) ->
-  NCent = Year div 100,
-  NRemain19 = Year rem 19,
-  N1Tmp1 = fix(NCent, ((NCent - 15) div 2) + 202 - (11 * NRemain19)),
-  N1Tmp2 = N1Tmp1 rem 30,
-  N1 = case N1Tmp2 == 29 orelse (N1Tmp2 == 28 andalso NRemain19 > 10) of
-           true -> N1Tmp2 - 1;
-           false -> N1Tmp2
-       end,
-  DtPFM = case N1 > 10 of
-              true -> {Year, 4, N1 - 10};
-              false -> {Year, 3, N1 + 21}
-          end,
-  NWeekDay = calendar:day_of_the_week(DtPFM) rem 7,
-  shift(DtPFM, 7 - NWeekDay, days).
+    NCent = Year div 100,
+    NRemain19 = Year rem 19,
+    N1Tmp1 = fix(NCent, ((NCent - 15) div 2) + 202 - (11 * NRemain19)),
+    N1Tmp2 = N1Tmp1 rem 30,
+    N1 =
+        case N1Tmp2 == 29 orelse (N1Tmp2 == 28 andalso NRemain19 > 10) of
+            true -> N1Tmp2 - 1;
+            false -> N1Tmp2
+        end,
+    DtPFM =
+        case N1 > 10 of
+            true -> {Year, 4, N1 - 10};
+            false -> {Year, 3, N1 + 21}
+        end,
+    NWeekDay = calendar:day_of_the_week(DtPFM) rem 7,
+    shift(DtPFM, 7 - NWeekDay, days).
 
 fix(NCent, N1) when NCent >= 38 -> N1 - 2;
 fix(NCent, N1) when NCent == 21 orelse NCent == 24 orelse NCent == 25 -> N1 - 1;
@@ -127,6 +137,16 @@ shift_test_() ->
      ?_assertEqual({2012,2,29}, shift({2012,1,31}, 1, month)),
      ?_assertEqual({2012,2,29}, shift({2012,4,30}, -2, months)),
      ?_assertEqual({2013,2,28}, shift({2012,2,29}, 1, year))].
+
+beginning_of_month_test_() ->
+    [?_assertEqual({2012,2,1}, beginning_of_month({2012,2,15})),
+     ?_assertEqual({2012,2,1}, beginning_of_month({2012,2,1}))].
+
+end_of_month_test_() ->
+    [?_assertEqual({2012,2,29}, end_of_month({2012,2,29})),
+     ?_assertEqual({2012,2,29}, end_of_month({2012,2,1})),
+     ?_assertEqual({2010,2,28}, end_of_month({2010,2,28})),
+     ?_assertEqual({2010,2,28}, end_of_month({2010,2,1}))].
 
 easter_test_() ->
     [?_assertEqual({2008,3,23}, easter(2008)),

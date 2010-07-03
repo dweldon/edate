@@ -25,11 +25,25 @@ Period is `day | days | week | weeks | month | months | year | years`
 ### shift(StartDate, N, Period) -> Date
 returns a new date after shifting StartDate by N periods. N is an integer,
 Period is `day | days | week | weeks | month | months | year | years`
-    > edate:shift({2000,1,1}, -2, days)
+    > edate:shift({2000,1,1}, -2, days).
     {1999,12,30}
-    > edate:shift({2000,1,1}, 1, week)
+    > edate:shift({2000,1,1}, 1, week).
     {2000,1,8}
-    > edate:shift({2000,1,1}, 4, months)
+    > edate:shift({2000,1,1}, 4, months).
     {2000,5,1}
-    > edate:shift({2000,1,1}, 2, years)
+    > edate:shift({2000,1,1}, 2, years).
     {2002,1,1}
+
+### beginning_of_month(StartDate) -> Date
+returns a new date representing the beginning of the month containing StartDate.
+    > edate:beginning_of_month({2010,2,15}).
+    {2010,2,1}
+    > edate:beginning_of_month(edate:shift(-1, month)).
+    {2010,6,1}
+
+### end_of_month(StartDate) -> Date
+returns a new date representing the end of the month containing StartDate.
+    > edate:end_of_month({2010,2,15}).
+    {2010,2,28}
+    > edate:end_of_month(edate:shift(-1, month)).
+    {2010,6,30}
