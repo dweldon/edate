@@ -14,6 +14,7 @@ Functions
 * yesterday/0
 * shift/2
 * shift/3
+* subtract/2
 * beginning_of_month/1
 * end_of_month/1
 * date_to_string/1
@@ -46,6 +47,13 @@ Period is `day | days | week | weeks | month | months | year | years`
     {2000,5,1}
     > edate:shift({2000,1,1}, 2, years).
     {2002,1,1}
+
+### subtract(Date1, Date2) -> Days
+returns Date1 - Date2 in an integer number of days. if Days > 0, Date1 > Date2.
+    > edate:subtract({2010,7,4}, {2010,7,1}).
+    3
+    > edate:subtract({2010,7,1}, {2010,7,4}).
+    -3
 
 ### beginning_of_month(StartDate) -> Date
 returns a new date representing the beginning of the month containing StartDate.

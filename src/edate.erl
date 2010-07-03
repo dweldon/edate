@@ -18,6 +18,7 @@
          yesterday/0,
          shift/2,
          shift/3,
+         subtract/2,
          beginning_of_month/1,
          end_of_month/1,
          date_to_string/1,
@@ -65,6 +66,11 @@ find_valid_date(Date) ->
             {Y, M, D} = Date,
             find_valid_date({Y, M, D-1})
     end.
+
+% @spec subtract(Date1::date(), Date2::date()) -> integer()
+subtract(Date1, Date2) ->
+    calendar:date_to_gregorian_days(Date1) -
+    calendar:date_to_gregorian_days(Date2).
 
 % @spec beginning_of_month(Date::date()) -> date()
 beginning_of_month({Y, M, _D}) -> {Y, M, 1}.
@@ -168,6 +174,12 @@ shift_test_() ->
      ?_assertEqual({2012,2,29}, shift({2012,1,31}, 1, month)),
      ?_assertEqual({2012,2,29}, shift({2012,4,30}, -2, months)),
      ?_assertEqual({2013,2,28}, shift({2012,2,29}, 1, year))].
+
+subtract_test_() ->
+    [?_assertEqual(3, subtract({2010,7,4}, {2010,7,1})),
+     ?_assertEqual(-3, subtract({2010,7,1}, {2010,7,4})),
+     ?_assertEqual(1, subtract(today(), yesterday())),
+     ?_assertEqual(0, subtract(today(), today()))].
 
 beginning_of_month_test_() ->
     [?_assertEqual({2012,2,1}, beginning_of_month({2012,2,15})),
