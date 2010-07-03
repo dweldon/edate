@@ -9,6 +9,19 @@ Installation
 
 Functions
 ---------
+* today/0
+* tomorrow/0
+* yesterday/0
+* shift/2
+* shift/3
+* beginning_of_month/1
+* end_of_month/1
+* date_to_string/1
+* string_to_date/1
+* day_of_week/1
+
+Function Descriptions
+---------------------
 ### today() -> Date
 returns today's date.
 
@@ -60,3 +73,8 @@ returns a date representation of String. the following formats are valid
     {1976,3,18}
     > edate:string_to_date("3/18/1976").
     {1976,3,18}
+
+### day_of_week(Date) -> String
+returns the day of the week as a string ("monday".."sunday").
+    > edate:day_of_week({2010,7,4}).
+    "sunday"

@@ -21,7 +21,8 @@
          beginning_of_month/1,
          end_of_month/1,
          date_to_string/1,
-         string_to_date/1]).
+         string_to_date/1,
+         day_of_week/1]).
 -export([easter/1]).
 -include_lib("eunit/include/eunit.hrl").
 
@@ -86,6 +87,18 @@ string_to_date(String) ->
     Date = list_to_tuple([list_to_integer(X) || X <- [Year, Month, Day]]),
     true = calendar:valid_date(Date),
     Date.
+
+% @spec day_of_week(Date) -> string()
+day_of_week(Date) ->
+    case calendar:day_of_the_week(Date) of
+        1 -> "monday";
+        2 -> "tuesday";
+        3 -> "wednesday";
+        4 -> "thursday";
+        5 -> "friday";
+        6 -> "saturday";
+        7 -> "sunday"
+    end.
 
 % derived from http://www.gmarts.org/index.php?go=415#geteasterdatec
 % converted by Evan Haas <evanhaas@gmail.com>
@@ -180,6 +193,15 @@ string_to_date_test_() ->
      ?_assertEqual({2010,1,2}, string_to_date("1-2-2010")),
      ?_assertEqual({2010,1,2}, string_to_date("01/02/2010")),
      ?_assertEqual({2010,1,2}, string_to_date("1/2/2010"))].
+
+day_of_week_test_() ->
+    [?_assertEqual("monday", day_of_week({2010,6,28})),
+     ?_assertEqual("tuesday", day_of_week({2010,6,29})),
+     ?_assertEqual("wednesday", day_of_week({2010,6,30})),
+     ?_assertEqual("thursday", day_of_week({2010,7,1})),
+     ?_assertEqual("friday", day_of_week({2010,7,2})),
+     ?_assertEqual("saturday", day_of_week({2010,7,3})),
+     ?_assertEqual("sunday", day_of_week({2010,7,4}))].
 
 easter_test_() ->
     [?_assertEqual({2008,3,23}, easter(2008)),
