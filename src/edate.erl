@@ -27,7 +27,9 @@
          string_to_date/1,
          day_of_week/1]).
 -export([easter/1]).
+-ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
+-endif.
 
 % @spec today() -> date()
 today() -> date().
@@ -142,6 +144,8 @@ fix(NCent, N1) when NCent == 33 orelse NCent == 36 orelse NCent == 37 -> N1 - 2;
 fix(NCent, N1) when NCent > 26 -> N1 - 1;
 fix(_NCent, N1) -> N1.
 
+-ifdef(TEST).
+
 shift_test_() ->
     [?_assertEqual(date(), shift(0, days)),
      ?_assertEqual(date(), shift(0, days)),
@@ -241,3 +245,5 @@ easter_test_() ->
      ?_assertEqual({2012,4,8}, easter(2012)),
      ?_assertEqual({2013,3,31}, easter(2013)),
      ?_assertEqual({2014,4,20}, easter(2014))].
+
+-endif.
