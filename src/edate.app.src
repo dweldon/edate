@@ -3,5 +3,5 @@
   {vsn, "0.1"},
   {registered, []},
   {applications, [kernel, stdlib]},
-  {mod, {estring_app, []}},
+  {mod, {edate_app, []}},
   {env, []}]}.
