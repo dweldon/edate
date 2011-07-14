@@ -21,10 +21,10 @@
          day_of_week/1,
          easter/1,
          end_of_month/1,
+         is_after/2,
+         is_before/2,
          is_in_future/1,
          is_in_past/1,
-				 is_before/2,
-				 is_after/2,
          shift/2,
          shift/3,
          string_to_date/1,
@@ -128,7 +128,25 @@ fix(_NCent, N1) -> N1.
 -spec end_of_month(date()) -> date().
 end_of_month({Y, M, _D}) -> {Y, M, calendar:last_day_of_the_month(Y, M)}.
 
-%% @spec is_in_future(date()) -> bool()
+%% @spec is_after(date(), date()) -> boolean()
+%% @doc Returns `true' if `Date1' is after `Date2', and `false' otherwise.
+%% ```
+%% > edate:is_after({1950,7,3}, {1950,7,2}).
+%% true
+%% '''
+-spec is_after(date(), date()) -> boolean().
+is_after(Date1, Date2) -> subtract(Date1, Date2) > 0.
+
+%% @spec is_before(date(), date()) -> boolean()
+%% @doc Returns `true' if `Date1' is before `Date2', and `false' otherwise.
+%% ```
+%% > edate:is_before({1950,7,1}, {1950,7,2}).
+%% true
+%% '''
+-spec is_before(date(), date()) -> boolean().
+is_before(Date1, Date2) -> subtract(Date1, Date2) < 0.
+
+%% @spec is_in_future(date()) -> boolean()
 %% @doc Returns `true' if `Date' is in the future, and `false' otherwise.
 %% ```
 %% > edate:is_in_future({3000,7,1}).
@@ -137,7 +155,7 @@ end_of_month({Y, M, _D}) -> {Y, M, calendar:last_day_of_the_month(Y, M)}.
 -spec is_in_future(date()) -> boolean().
 is_in_future(Date) -> subtract(Date, today()) > 0.
 
-%% @spec is_in_past(date()) -> bool()
+%% @spec is_in_past(date()) -> boolean()
 %% @doc Returns `true' if `Date' is in the past, and `false' otherwise.
 %% ```
 %% > edate:is_in_past({1950,7,1}).
@@ -145,22 +163,6 @@ is_in_future(Date) -> subtract(Date, today()) > 0.
 %% '''
 -spec is_in_past(date()) -> boolean().
 is_in_past(Date) -> subtract(Date, today()) < 0.
-
-%% @spec is_before(date(), date()) -> bool()
-%% @doc Returns `true' if `Date1' is before `Date2', and `false' otherwise.
-%% ```
-%% > edate:is_before({1950,7,1}, {1950, 7, 2}).
-%% true
-%% '''
-is_before(Date1, Date2) -> subtract(Date1, Date2) < 0.
-
-%% @spec is_after(date(), date()) -> bool()
-%% @doc Returns `true' if `Date1' is after `Date2', and `false' otherwise.
-%% ```
-%% > edate:is_after({1950,7,3}, {1950, 7, 2}).
-%% true
-%% '''
-is_after(Date1, Date2) -> subtract(Date1, Date2) > 0.
 
 %% @spec shift(integer(), period()) -> date()
 %% @doc Returns a new date after shifting today's date by `N' periods.
@@ -287,6 +289,16 @@ end_of_month_test_() ->
      ?_assertEqual({2010,2,28}, end_of_month({2010,2,28})),
      ?_assertEqual({2010,2,28}, end_of_month({2010,2,1}))].
 
+is_after_test_() ->
+    [?_assertEqual(true, is_after({2011,7,14}, {2011,7,13})),
+     ?_assertEqual(false, is_after({2011,7,14}, {2011,7,14})),
+     ?_assertEqual(false, is_after({2011,7,13}, {2011,7,14}))].
+
+is_before_test_() ->
+    [?_assertEqual(false, is_before({2011,7,14}, {2011,7,13})),
+     ?_assertEqual(false, is_before({2011,7,14}, {2011,7,14})),
+     ?_assertEqual(true, is_before({2011,7,13}, {2011,7,14}))].
+
 is_in_future_test_() ->
     [?_assertEqual(true, is_in_future(tomorrow())),
      ?_assertEqual(false, is_in_future(yesterday())),
@@ -296,16 +308,6 @@ is_in_past_test_() ->
     [?_assertEqual(false, is_in_past(tomorrow())),
      ?_assertEqual(true, is_in_past(yesterday())),
      ?_assertEqual(false, is_in_past(today()))].
-
-is_before_test_() ->
-	[?_assertEqual(true, is_before(today(), tomorrow())),
-	 ?_assertEqual(false, is_before(tomorrow(), today())),
-   ?_assertEqual(true, is_before(yesterday(), today()))].
-
-is_after_test_() ->
-	[?_assertEqual(true, is_after(today(), yesterday())),
-	 ?_assertEqual(false, is_after(yesterday(), tomorrow())),
- 	 ?_assertEqual(true, is_after(tomorrow(), yesterday()))].
 
 shift_test_() ->
     [?_assertEqual(date(), shift(0, days)),
