@@ -33,6 +33,12 @@ complete documentation by running `make doc`.
     2
 
 ### Comparison
+    > edate:is_after({1950,7,2}, {1950,7,1}).
+    true
+
+    > edate:is_before({1950,7,1}, {1950,7,2}).
+    true
+
     > edate:is_in_future({3000,7,1}).
     true
 

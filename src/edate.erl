@@ -131,7 +131,7 @@ end_of_month({Y, M, _D}) -> {Y, M, calendar:last_day_of_the_month(Y, M)}.
 %% @spec is_after(date(), date()) -> boolean()
 %% @doc Returns `true' if `Date1' is after `Date2', and `false' otherwise.
 %% ```
-%% > edate:is_after({1950,7,3}, {1950,7,2}).
+%% > edate:is_after({1950,7,2}, {1950,7,1}).
 %% true
 %% '''
 -spec is_after(date(), date()) -> boolean().
