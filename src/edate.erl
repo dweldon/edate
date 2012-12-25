@@ -188,10 +188,15 @@ shift({Y, M, D}, N, Period) when Period =:= month; Period =:= months ->
     %% in order for the modular arithmetic to work, months in this function range
     %% from 0 to 11 (January to December)
     TotalMonths = 12*Y + M-1 + N,
-    Month = TotalMonths rem 12,
-    Year = (TotalMonths - Month) div 12,
-    %% add one back to the month to fix our mod 12 shenanigans
-    find_valid_date({Year, Month+1, D}).
+    case TotalMonths >= 0 of
+        true ->
+            Month = TotalMonths rem 12,
+            Year = (TotalMonths - Month) div 12,
+            %% add one back to the month to fix our mod 12 shenanigans
+            find_valid_date({Year, Month+1, D});
+        false ->
+            error(out_of_bounds)
+    end.
 
 %% @spec find_valid_date(date()) -> date()
 %% @doc Returns `Date' if valid. Otherwise, backward searches for a valid date.
@@ -339,6 +344,8 @@ shift_test_() ->
      %% month subtraction at year boundary
      ?_assertEqual({1999,12,1}, shift({2000,1,1}, -1, month)),
      ?_assertEqual({1999,11,1}, shift({2000,1,1}, -2, months)),
+     %% month subtraction before year 0
+     ?_assertError(out_of_bounds, shift({0, 1, 1}, -1, month)),
      %% 1 year = 12 months = 365 days (in a non-leap year)
      ?_assertEqual(shift({2001,5,10}, 1, year), shift({2001,5,10}, 12, months)),
      ?_assertEqual(shift({2001,5,10}, 1, year), shift({2001,5,10}, 365, days)),
