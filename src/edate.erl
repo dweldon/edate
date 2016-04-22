@@ -31,7 +31,8 @@
          subtract/2,
          today/0,
          tomorrow/0,
-         yesterday/0]).
+         yesterday/0,
+		 is_valid/1]).
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -endif.
@@ -208,6 +209,12 @@ find_valid_date(Date) ->
             {Y, M, D} = Date,
             find_valid_date({Y, M, D-1})
     end.
+
+%% @spec is_valid(date()) -> boolean()
+%% @doc Returns true if date is valid; otherwise false.
+-spec is_valid(date()) -> boolean().
+is_valid(Date) ->
+	calendar:valid_date(Date).
 
 %% @spec string_to_date(string()) -> date()
 %% @doc Converts `String' to a date. The following string formats are valid
